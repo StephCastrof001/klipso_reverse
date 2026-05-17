@@ -1,0 +1,18 @@
+# Ignorar repos individuales de cada CLI (tienen su propio git)
+bancolombia-cli/
+rappi-cli/
+spoti-cli/
+sunat-cli/
+trii-cli/
+ubereats-cli/
+whatsapp-cli/
+unir-cli/
+wiener-cli/
+v0-cli/
+v0-cli-site/
+cligentic/
+
+# Solo trackear _knowledge/ y _docs/
+# node_modules por si acaso
+node_modules/
+*.env
