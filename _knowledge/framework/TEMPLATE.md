@@ -69,18 +69,22 @@ Documentar en RESEARCH.md:
 ```
 
 ### 2.2 Instalar bloques cligentic
+Ver doc completo: [`_knowledge/cligentic.md`](../cligentic.md)
+
 ```bash
 # Bloques base obligatorios
-bunx shadcn add https://cligentic.dev/r/audit-log.json
-bunx shadcn add https://cligentic.dev/r/json-mode.json
-bunx shadcn add https://cligentic.dev/r/global-flags.json
-bunx shadcn add https://cligentic.dev/r/error-map.json
-bunx shadcn add https://cligentic.dev/r/xdg-paths.json
+bunx shadcn@latest add https://cligentic.railly.dev/r/json-mode.json
+bunx shadcn@latest add https://cligentic.railly.dev/r/next-steps.json
+bunx shadcn@latest add https://cligentic.railly.dev/r/error-map.json
+bunx shadcn@latest add https://cligentic.railly.dev/r/global-flags.json
+bunx shadcn@latest add https://cligentic.railly.dev/r/xdg-paths.json
+bunx shadcn@latest add https://cligentic.railly.dev/r/audit-log.json
 
 # Bloques según tipo de target
-bunx shadcn add https://cligentic.dev/r/trust-ladder.json   # si hay ops mutantes
-bunx shadcn add https://cligentic.dev/r/doctor.json         # siempre recomendado
-bunx shadcn add https://cligentic.dev/r/killswitch.json     # si maneja datos sensibles
+bunx shadcn@latest add https://cligentic.railly.dev/r/trust-ladder.json   # si hay ops mutantes
+bunx shadcn@latest add https://cligentic.railly.dev/r/doctor.json         # siempre recomendado
+bunx shadcn@latest add https://cligentic.railly.dev/r/killswitch.json     # si maneja datos sensibles
+bunx shadcn@latest add https://cligentic.railly.dev/r/api-key-wizard.json # Tipo D (API key auth)
 ```
 
 ### 2.3 package.json mínimo

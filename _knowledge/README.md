@@ -18,7 +18,8 @@ Cada CLI resuelve un target específico. El valor está en el RESEARCH.md de cad
 | **Spotify** | D | OAuth2 PKCE (official) | Rate limiting solo | [spoti-cli](../spoti-cli/) | [targets/spotify.md](targets/spotify.md) |
 | **Trii** | E | Bearer + sk2 cookie (2FA) + RSC | Cloudflare WAF | [trii-cli](../trii-cli/) | [targets/trii.md](targets/trii.md) |
 | **Wiener** | B+D | ASP form-post + Canvas PAT | Sin WAF adicional | [wiener-cli](../wiener-cli/) | [targets/wiener.md](targets/wiener.md) |
-| **v0** | D | API Key (Bearer official) | Rate limiting + intent tokens | [v0-cli](../v0-cli/) | — |
+| **v0** | D | API Key (Bearer official) | Rate limiting + intent tokens | [v0-cli](../v0-cli/) | [targets/v0.md](targets/v0.md) |
+| **Interbank** | C híbrido | ECIES P-256 + OTP email + Cookie JWT | Cloudflare WAF (Node.js bloqueado) | [Cli-propios/interbank-cli](../Cli-propios/interbank-cli/) | [targets/interbank.md](targets/interbank.md) |
 
 ---
 
@@ -28,15 +29,16 @@ Cada CLI resuelve un target específico. El valor está en el RESEARCH.md de cad
 |-----|-------------|
 | [framework/TYPES.md](framework/TYPES.md) | Taxonomía de tipos A-E + B+D — cómo identificar el tipo de target |
 | [framework/TEMPLATE.md](framework/TEMPLATE.md) | Proceso completo para un nuevo CLI: recon → scaffold → checklist |
+| [best-practices.md](best-practices.md) | Patrones concretos con fuentes: error handling, session TTL, audit, cache-first, dry-run, Hono server |
 | [_docs/MASTER_METHODOLOGY.md](../_docs/MASTER_METHODOLOGY.md) | Metodología consolidada original (7 repos) |
 
 ---
 
 ## Meta-framework
 
-| Repo | Descripción |
-|------|-------------|
-| [cligentic](../cligentic/) | 21 bloques copy-paste para CLI (shadcn model) — usar en todos los nuevos CLIs |
+| Repo | Descripción | Doc |
+|------|-------------|-----|
+| [cligentic](../cligentic/) | 22 bloques copy-paste para CLI (shadcn model) — usar en todos los nuevos CLIs | [cligentic.md](cligentic.md) |
 
 ---
 

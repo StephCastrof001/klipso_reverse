@@ -12,7 +12,12 @@ v0-cli/
 v0-cli-site/
 cligentic/
 
-# Solo trackear _knowledge/ y _docs/
-# node_modules por si acaso
+# CLIs propios — repos separados con su propio git
+Cli-propios/
+
+# Claude Code metadata
+.claude/
+
+# Solo trackear _knowledge/, _docs/, CLAUDE.md
 node_modules/
 *.env
