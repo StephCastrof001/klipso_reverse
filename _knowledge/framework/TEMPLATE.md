@@ -38,53 +38,67 @@ Documentar en RESEARCH.md:
 ### 2.1 Estructura de carpetas
 ```
 <nombre>-cli/
-  index.ts          ← dispatcher
-  server.ts         ← REST API (Bun.serve)
-  package.json
-  RESEARCH.md       ← del Fase 1
+  index.ts          ← Bun dispatcher (Record<cmd,file> + spawnSync — sin Commander)
+  server.ts         ← Hono REST API
+  RESEARCH.md       ← del Fase 1 (OBLIGATORIO antes de codear)
   CONTEXT.md        ← para AI agents
+  README.md
+  CLAUDE.md
+  package.json
+  biome.json
+  tsconfig.json
   src/
-    config.ts
-    constants.ts
-    http.ts
-    formatters.ts
-    schemas/
-    services/
+    config.ts       ← Zod + xdg-paths (~/.config/<app>/)
+    constants.ts    ← BASE_URL, ENDPOINTS
+    http.ts         ← AppError (isSessionExpired) + fetch wrapper
+    schemas/        ← Zod por dominio
+    services/       ← lógica de negocio
     validation/
-      input.ts
-    commands/
+      input.ts      ← validar inputs de usuario
+    commands/       ← un archivo por comando
     workflows/      ← solo Tipo B/C
     browser/        ← solo Tipo A/B/C
-      client.ts
       auth.ts
       cdp.ts        ← solo si hay iframes cross-origin
-      captcha.ts    ← solo si hay reCAPTCHA
-    ui/
-      chalk.ts
-      spinner.ts
-      table.ts
-      banner.ts
+    cli/            ← bloques cligentic (NO inventar ui/ propio)
+      agent/
+      foundation/
+      platform/
+      safety/
     mcp/
-      index.ts
+      server.ts     ← MCP multi-tool (patrón interbank-cli)
+  tests/
+    unit/           ← bun:test para lógica pura
 ```
 
-### 2.2 Instalar bloques cligentic
+### 2.2 Instalar bloques cligentic (desde monorepo local)
 Ver doc completo: [`_knowledge/cligentic.md`](../cligentic.md)
 
 ```bash
-# Bloques base obligatorios
-bunx shadcn@latest add https://cligentic.railly.dev/r/json-mode.json
-bunx shadcn@latest add https://cligentic.railly.dev/r/next-steps.json
-bunx shadcn@latest add https://cligentic.railly.dev/r/error-map.json
-bunx shadcn@latest add https://cligentic.railly.dev/r/global-flags.json
-bunx shadcn@latest add https://cligentic.railly.dev/r/xdg-paths.json
-bunx shadcn@latest add https://cligentic.railly.dev/r/audit-log.json
+# Los bloques están en el monorepo — NO hace falta internet
+REGISTRY="C:/Users/HP SUPPORT/klipso_reverse/cligentic/registry"
+mkdir -p src/cli/agent src/cli/foundation src/cli/platform src/cli/safety
 
-# Bloques según tipo de target
-bunx shadcn@latest add https://cligentic.railly.dev/r/trust-ladder.json   # si hay ops mutantes
-bunx shadcn@latest add https://cligentic.railly.dev/r/doctor.json         # siempre recomendado
-bunx shadcn@latest add https://cligentic.railly.dev/r/killswitch.json     # si maneja datos sensibles
-bunx shadcn@latest add https://cligentic.railly.dev/r/api-key-wizard.json # Tipo D (API key auth)
+# Obligatorios
+cp "$REGISTRY/agent/json-mode.ts"         src/cli/agent/
+cp "$REGISTRY/agent/next-steps.ts"        src/cli/agent/
+cp "$REGISTRY/agent/doctor.ts"            src/cli/agent/
+cp "$REGISTRY/foundation/error-map.ts"    src/cli/foundation/
+cp "$REGISTRY/foundation/global-flags.ts" src/cli/foundation/
+cp "$REGISTRY/foundation/xdg-paths.ts"    src/cli/foundation/
+cp "$REGISTRY/foundation/audit-log.ts"    src/cli/foundation/
+cp "$REGISTRY/platform/detect.ts"         src/cli/platform/
+
+# Condicionales
+cp "$REGISTRY/agent/trust-ladder.ts"      src/cli/agent/      # ops mutantes (add, remove, delete)
+cp "$REGISTRY/safety/killswitch.ts"       src/cli/safety/     # dinero/datos sensibles
+cp "$REGISTRY/agent/api-key-wizard.ts"    src/cli/agent/      # Tipo D (API key)
+
+# Dep necesaria para json-mode y next-steps
+bun add picocolors
+
+# Fix lint post-copia
+bun x biome check --write --unsafe src/cli/
 ```
 
 ### 2.3 package.json mínimo
@@ -92,24 +106,31 @@ bunx shadcn@latest add https://cligentic.railly.dev/r/api-key-wizard.json # Tipo
 {
   "name": "<nombre>-cli",
   "version": "0.1.0",
+  "type": "module",
   "bin": { "<nombre>": "./index.ts" },
   "scripts": {
-    "dev": "bun run index.ts",
-    "build": "bun build index.ts --outdir dist",
-    "lint": "biome check src/"
+    "<nombre>": "bun run index.ts",
+    "mcp": "bun run src/mcp/server.ts",
+    "server": "bun run server.ts",
+    "lint": "biome check src/",
+    "lint:fix": "biome check --write src/",
+    "test": "bun test"
   },
   "dependencies": {
-    "zod": "^3.24.0",
-    "@clack/prompts": "^1.0.0",
-    "chalk": "^5.0.0",
-    "commander": "^14.0.0"
+    "@modelcontextprotocol/sdk": "^1.15.0",
+    "chalk": "^5.3.0",
+    "hono": "^4.12.0",
+    "picocolors": "^1.1.1",
+    "zod": "^3.24.0"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.0",
-    "typescript": "^5.0.0"
+    "@types/bun": "latest"
   }
 }
 ```
+
+> ⚠ **Sin Commander.** El dispatcher usa `Record<cmd, filepath>` + `spawnSync(bunPath, ["run", file])` — ver `index.ts` de cualquier CLI del framework.
 
 ---
 
@@ -201,7 +222,10 @@ const data = JSON.parse(lines.find(l => l.startsWith('1:'))!.slice(2));
 - [ ] `src/validation/input.ts` valida todos los inputs del usuario
 - [ ] `TypedError` en `http.ts` con `statusCode` y `isSessionExpired`
 - [ ] Audit trail en `~/.config/<cmd>/audit/YYYY-MM-DD.jsonl`
-- [ ] Biome lint sin errores
+- [ ] Biome lint sin errores (`bun x biome check src/`)
+- [ ] Tests unitarios con `bun test` para lógica pura (schemas, parsers, utils)
+  - Referencia: `v0-cli/tests/unit/` — usar `bun:test`, no vitest
+  - Testear: extracción de datos, normalización, parsing de args, helpers de config
 
 ### Distribución
 - [ ] `bin` en package.json apunta a `index.ts`
