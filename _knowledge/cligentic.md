@@ -66,29 +66,44 @@ bunx shadcn@latest add https://cligentic.railly.dev/r/<block>.json
 
 ## Cómo instalar en nuevo CLI
 
+### ✅ Forma rápida — copiar desde el monorepo local (recomendado)
+
+Los bloques ya están en `klipso_reverse/cligentic/registry/`. No hace falta internet ni `bunx shadcn`.
+
 ```bash
-# Mínimo viable para CLI agentico
-bunx shadcn@latest add https://cligentic.railly.dev/r/json-mode.json
-bunx shadcn@latest add https://cligentic.railly.dev/r/next-steps.json
-bunx shadcn@latest add https://cligentic.railly.dev/r/error-map.json
-bunx shadcn@latest add https://cligentic.railly.dev/r/global-flags.json
-bunx shadcn@latest add https://cligentic.railly.dev/r/xdg-paths.json
-bunx shadcn@latest add https://cligentic.railly.dev/r/audit-log.json
+# Crear estructura de destino
+mkdir -p src/cli/agent src/cli/foundation src/cli/platform src/cli/safety
 
-# Si hay ops mutantes
-bunx shadcn@latest add https://cligentic.railly.dev/r/trust-ladder.json
+# Copiar mínimo viable (9 bloques obligatorios)
+REGISTRY="C:/Users/HP SUPPORT/klipso_reverse/cligentic/registry"
+cp "$REGISTRY/agent/json-mode.ts"         src/cli/agent/
+cp "$REGISTRY/agent/next-steps.ts"        src/cli/agent/
+cp "$REGISTRY/agent/doctor.ts"            src/cli/agent/
+cp "$REGISTRY/foundation/error-map.ts"    src/cli/foundation/
+cp "$REGISTRY/foundation/global-flags.ts" src/cli/foundation/
+cp "$REGISTRY/foundation/xdg-paths.ts"    src/cli/foundation/
+cp "$REGISTRY/foundation/audit-log.ts"    src/cli/foundation/
+cp "$REGISTRY/platform/detect.ts"         src/cli/platform/   # dep de json-mode
 
-# Siempre recomendado
-bunx shadcn@latest add https://cligentic.railly.dev/r/doctor.json
+# Condicionales
+cp "$REGISTRY/agent/trust-ladder.ts"      src/cli/agent/      # si hay ops mutantes
+cp "$REGISTRY/safety/killswitch.ts"       src/cli/safety/     # si maneja dinero/datos sensibles
 
-# Si CLI maneja dinero o datos sensibles
-bunx shadcn@latest add https://cligentic.railly.dev/r/killswitch.json
+# Instalar dep de picocolors (json-mode y next-steps lo usan)
+bun add picocolors
 
-# Para Tipo D (API key auth)
-bunx shadcn@latest add https://cligentic.railly.dev/r/api-key-wizard.json
+# Correr lint y auto-fix (los bloques vienen con estilo propio)
+bun x biome check --write --unsafe src/cli/
 ```
 
-Los bloques se instalan en `src/cli/<category>/`. Las dependencias entre bloques se resuelven automáticamente via `registryDependencies` — instalar `next-steps` trae `json-mode` sin pedirlo.
+### Alternativa — descargar desde registry online
+
+```bash
+bunx shadcn@latest add https://cligentic.railly.dev/r/json-mode.json
+# ... etc. Más lento, requiere internet. Solo usar si el monorepo no está disponible.
+```
+
+Los bloques se instalan en `src/cli/<category>/`. La dependencia `detect.ts` debe copiarse siempre junto con `json-mode.ts`.
 
 ## prototype-consumer (case study)
 
@@ -105,6 +120,41 @@ Los bloques se instalan en `src/cli/<category>/`. Las dependencias entre bloques
 | sunat-cli | config, xdg-paths, json-mode, next-steps, telemetry |
 | webctl | xdg-paths, config, session |
 | broker-cli (privado) | killswitch, audit-log, session, atomic-write, trust-ladder |
+
+## Tests — patrón del framework
+
+**Runner: `bun:test`** (nativo de Bun). No usar vitest.
+
+```bash
+# package.json
+"test": "bun test"
+
+# Correr
+bun test
+```
+
+```typescript
+// tests/unit/price-extraction.test.ts
+import { test, expect } from "bun:test";
+import { normalizeVtexSearch } from "../../src/schemas/product.js";
+
+test("extrae precio OH desde Teasers", () => {
+  const raw = [/* mock VTEX response */];
+  const result = normalizeVtexSearch(raw);
+  expect(result[0].prices.oh).toBe(12.50);
+});
+```
+
+**Qué testear:** funciones puras de schemas y utils — NO comandos, NO servicios con HTTP.
+- Extracción de precios (dual Teasers/Installments para OH)
+- Normalización de orderForm (centavos → soles)
+- Parsing de args CLI
+- configAgeLabel(), configExists()
+
+**Referencia:** `v0-cli/tests/unit/` — único CLI del framework con tests (10 unit tests).
+bancolombia-cli, rappi-cli, sunat-cli: sin tests.
+
+---
 
 ## Diferencia con ui/ manual (rappi-cli, bancolombia-cli)
 
