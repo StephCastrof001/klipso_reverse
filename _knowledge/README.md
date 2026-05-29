@@ -20,6 +20,8 @@ Cada CLI resuelve un target específico. El valor está en el RESEARCH.md de cad
 | **Wiener** | B+D | ASP form-post + Canvas PAT | Sin WAF adicional | [wiener-cli](../wiener-cli/) | [targets/wiener.md](targets/wiener.md) |
 | **v0** | D | API Key (Bearer official) | Rate limiting + intent tokens | [v0-cli](../v0-cli/) | [targets/v0.md](targets/v0.md) |
 | **Interbank** | C híbrido | ECIES P-256 + OTP email + Cookie JWT | Cloudflare WAF (Node.js bloqueado) | [Cli-propios/interbank-cli](../Cli-propios/interbank-cli/) | [targets/interbank.md](targets/interbank.md) |
+| **Cineplanet** | A | Público (cache) + usersession browser (gated) | Azure Front Door + APIM (403 gate) | [Cli-propios/cineplanet-cli](../Cli-propios/cineplanet-cli/) | [targets/cineplanet.md](targets/cineplanet.md) |
+| **Plaza Vea** | B | Cookie `VtexIdclientAutCookie_plazavea` (Playwright browser) | Sin WAF notable | [Cli-propios/plazavea-cli](../Cli-propios/plazavea-cli/) | [targets/plazavea.md](targets/plazavea.md) |
 
 ---
 
